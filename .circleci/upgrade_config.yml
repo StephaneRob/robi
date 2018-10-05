@@ -77,7 +77,7 @@ jobs:
           name: Fetch current running versions
           command: |
             export PREV_APP_VERSION=$(head -1 manifests/current_versions.txt)
-            scp -R $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/releases/$PREV_APP_VERSION _build/prod/rel/robi/releases/
+            scp -r $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/releases/$PREV_APP_VERSION _build/prod/rel/robi/releases/
       - persist_to_workspace:
         root: _build/prod/rel/robi
         paths:
@@ -130,7 +130,7 @@ jobs:
           name: Deploy Over SSH
           command: |
             export APP_VERSION=$(head -1 manifests/versions.txt)
-            scp -R _build/prod/rel/robi/releases/$APP_VERSION $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/releases/
+            scp -r _build/prod/rel/robi/releases/$APP_VERSION $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/releases/
             ssh $SSH_USER@$SSH_HOST "cd /home/stephane/domains/robi.stephanerobino.com/ && tar -zxvf releases/$APP_VERSION/robi.tar.gz -C public_html/"
             ssh $SSH_USER@$SSH_HOST "/home/stephane/domains/robi.stephanerobino.com/public_html/bin/robi stop || true"
             ssh $SSH_USER@$SSH_HOST "/home/stephane/domains/robi.stephanerobino.com/public_html/bin/robi start"
