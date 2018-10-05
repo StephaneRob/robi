@@ -61,6 +61,8 @@ jobs:
           name: Add remote host fingerprint
           command: |
             ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
+      - attach_workspace:
+          at: manifests
       - run:
           name: Fetch current running versions
           command: |
