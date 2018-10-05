@@ -67,24 +67,24 @@ jobs:
           paths:
             - robi.tar.gz
 
-    deploy:
-      <<: *defaults
-      machine:
-        enabled: true
-      steps:
-        - attach_workspace:
-            at: _build/prod/rel/robi/releases/0.0.1
-        - run:
-            name: Add remote host fingerprint
-            command: |
-              ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
-        - run:
-            name: Deploy Over SSH
-            command: |
-              scp _build/prod/rel/robi/releases/0.0.1/robi.tar.gz $SSH_USER@$SSH_HOST:~/domains/robi.stephanerobino.com/public_html/
-              ssh $SSH_USER@$SSH_HOST "tar xfz robi.tar.gz"
-              ssh $SSH_USER@$SSH_HOST "bin/robi stop || true"
-              ssh $SSH_USER@$SSH_HOST "bin/robi start"
+  deploy:
+    <<: *defaults
+    machine:
+      enabled: true
+    steps:
+      - attach_workspace:
+          at: _build/prod/rel/robi/releases/0.0.1
+      - run:
+          name: Add remote host fingerprint
+          command: |
+            ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
+      - run:
+          name: Deploy Over SSH
+          command: |
+            scp _build/prod/rel/robi/releases/0.0.1/robi.tar.gz $SSH_USER@$SSH_HOST:~/domains/robi.stephanerobino.com/public_html/
+            ssh $SSH_USER@$SSH_HOST "tar xfz robi.tar.gz"
+            ssh $SSH_USER@$SSH_HOST "bin/robi stop || true"
+            ssh $SSH_USER@$SSH_HOST "bin/robi start"
 workflows:
   version: 2
   btd:
