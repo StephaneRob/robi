@@ -1,20 +1,47 @@
+defaults: &defaults
+  working_directory: ~/robi
+
 version: 2
 jobs:
-  build:
+  checkout:
+    <<: *defaults
     docker:
-      # specify the version here
       - image: circleci/elixir:1.7.3
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    working_directory: ~/repo
     steps:
       - checkout
+      - save_cache:
+          key: v1-robi-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/robi
 
-      # specify any bash command here prefixed with `run: `
+  mix_deps_get_and_test:
+    <<: *defaults
+    docker:
+      - image: circleci/elixir:1.7.3
+    steps:
+      - run:
+          name: install hex & rebar
+          command: mix do local.hex --force, local.rebar --force
+      - restore_cache:
+          key: v1-robi-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          keys:
+            - v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - v1-mix-cache-{{ .Branch }}
+            - v1-mix-cache
       - run: mix deps.get
-      - run: mix ecto.create
-      - run: mix test
+      - save_cache:
+          key: v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths:
+            - deps
+      - save_cache:
+          key: v1-mix-cache-{{ .Branch }}
+          paths:
+            - deps
+      - save_cache:
+          key: v1-mix-cache
+          paths:
+            - deps
+      - run:
+          name: Run test
+          command: mix test
