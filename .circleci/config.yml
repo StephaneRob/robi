@@ -74,7 +74,7 @@ jobs:
           at: manifests
       - run:
           name: Set env variable version
-          command: export APP_VERSION=`head -1 versions.txt`
+          command: export APP_VERSION=`head -1 manifests/versions.txt`
       - run:
           name: Create release
           command: MIX_ENV=prod mix release
