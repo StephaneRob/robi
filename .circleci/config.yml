@@ -14,10 +14,10 @@ jobs:
           paths:
             - ~/robi
       - run: mkdir manifests
-      - run: touch versions.txt
+      - run: touch manifests/versions.txt
       - run:
           name: Update Manifests
-          command: echo -e "$(date +%Y.%m.%d%H%M)\n$(cat versions.txt)" > versions.txt
+          command: echo -e "$(date +%Y.%m.%d%H%M)\n$(cat manifests/versions.txt)" > manifests/versions.txt
       - persist_to_workspace:
           root: manifests
           paths:
