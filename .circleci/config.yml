@@ -65,12 +65,12 @@ jobs:
 
 workflows:
   version: 2
-    btd:
-      jobs:
-        - checkout
-        - mix_deps_get:
-            requires:
-              - checkout
-        - build:
-            requires:
-              - mix_deps_get
+  btd:
+    jobs:
+      - checkout
+      - mix_deps_get:
+          requires:
+            - checkout
+      - build:
+          requires:
+            - mix_deps_get
