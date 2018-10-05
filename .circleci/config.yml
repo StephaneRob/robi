@@ -17,7 +17,7 @@ jobs:
       - run: touch manifests/versions.txt
       - run:
           name: Update Manifests
-          command: echo -e "$(date +%Y.%m.%d%H%M)\n$(cat manifests/versions.txt)" > manifests/versions.txt
+          command: echo -e "$(date +%y%m%d.%H.%M)\n$(cat manifests/versions.txt)" > manifests/versions.txt
       - persist_to_workspace:
           root: manifests
           paths:
@@ -73,11 +73,8 @@ jobs:
       - attach_workspace:
           at: manifests
       - run:
-          name: Set env variable version
-          command: export APP_VERSION=`head -1 manifests/versions.txt`
-      - run:
           name: Create release
-          command: MIX_ENV=prod mix release
+          command: APP_ENV=`head -1 manifests/versions.txt` MIX_ENV=prod mix release
       - persist_to_workspace:
           root: _build/prod/rel/robi/releases/$APP_VERSION
           paths:
