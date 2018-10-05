@@ -66,9 +66,9 @@ jobs:
           command: |
             scp $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/public_html/manifests/versions.txt manifests/current_versions.txt
       - persist_to_workspace:
-        root: manifests
-        paths:
-          - current_versions.txt
+          root: manifests
+          paths:
+            - current_versions.txt
       - run: mkdir -p _build/prod/rel/robi/releases
       - run:
           name: Fetch current running versions
@@ -76,9 +76,9 @@ jobs:
             export PREV_APP_VERSION=$(head -1 manifests/current_versions.txt)
             scp -r $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/releases/$PREV_APP_VERSION _build/prod/rel/robi/releases/
       - persist_to_workspace:
-        root: _build/prod/rel/robi
-        paths:
-          - releases
+          root: _build/prod/rel/robi
+          paths:
+            - releases
 
   build:
     <<: *defaults
