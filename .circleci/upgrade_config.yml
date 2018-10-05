@@ -148,7 +148,7 @@ workflows:
             - mix_deps_get_and_test
       - build:
           requires:
-            - mix_deps_get_and_test
+            - prev_release
       - deploy:
           requires:
             - build
