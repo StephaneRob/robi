@@ -71,12 +71,11 @@ jobs:
           root: manifests
           paths:
             - current_versions.txt
-      - run: mkdir -p _build/prod/rel/robi/releases
       - run:
           name: Fetch current running versions
           command: |
-            export PREV_APP_VERSION=$(head -1 manifests/current_versions.txt)
-            scp -r $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/_build/prod _build/prod/
+            scp $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/prod.tar.gz .
+            tar -zxvf prod.tar.gz
       - persist_to_workspace:
           root: _build/prod
           paths:
