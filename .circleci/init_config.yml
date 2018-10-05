@@ -51,9 +51,6 @@ jobs:
           key: v1-mix-cache
           paths:
             - deps
-      - run:
-          name: Run test
-          command: mix test
 
   build:
     <<: *defaults
