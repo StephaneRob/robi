@@ -45,3 +45,32 @@ jobs:
       - run:
           name: Run test
           command: mix test
+
+    build:
+      <<: *defaults
+      docker:
+        - image: circleci/elixir:1.7.3
+      steps:
+        - run:
+            name: install hex & rebar
+            command: mix do local.hex --force, local.rebar --force
+        - restore_cache:
+          key: v1-robi-{{ .Environment.CIRCLE_SHA1 }}
+        - restore_cache:
+            keys:
+              - v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+              - v1-mix-cache-{{ .Branch }}
+              - v1-mix-cache
+        - run: MIX_ENV=prod mix release
+
+workflows:
+  version: 2
+    btd:
+      jobs:
+        - checkout
+        - mix_deps_get:
+            requires:
+              - checkout
+        - build:
+            requires:
+              - mix_deps_get
