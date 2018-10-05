@@ -81,10 +81,10 @@ jobs:
       - run:
           name: Deploy Over SSH
           command: |
-            scp _build/prod/rel/robi/releases/0.0.1/robi.tar.gz $SSH_USER@$SSH_HOST:~/domains/robi.stephanerobino.com/public_html/
-            ssh $SSH_USER@$SSH_HOST "tar xfz ~/domains/robi.stephanerobino.com/public_html/robi.tar.gz"
-            ssh $SSH_USER@$SSH_HOST "~/domains/robi.stephanerobino.com/public_html/bin/robi stop || true"
-            ssh $SSH_USER@$SSH_HOST "~/domains/robi.stephanerobino.com/public_html/bin/robi start"
+            scp _build/prod/rel/robi/releases/0.0.1/robi.tar.gz $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/public_html/
+            ssh $SSH_USER@$SSH_HOST "tar xfz /home/stephane/domains/robi.stephanerobino.com/public_html/robi.tar.gz"
+            ssh $SSH_USER@$SSH_HOST "/home/stephane/domains/robi.stephanerobino.com/public_html/bin/robi stop || true"
+            ssh $SSH_USER@$SSH_HOST "/home/stephane/domains/robi.stephanerobino.com/public_html/bin/robi start"
 workflows:
   version: 2
   btd:
