@@ -55,7 +55,7 @@ jobs:
           name: install hex & rebar
           command: mix do local.hex --force, local.rebar --force
       - restore_cache:
-        key: v1-robi-{{ .Environment.CIRCLE_SHA1 }}
+          key: v1-robi-{{ .Environment.CIRCLE_SHA1 }}
       - restore_cache:
           keys:
             - v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
