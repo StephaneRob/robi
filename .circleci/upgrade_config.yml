@@ -76,11 +76,12 @@ jobs:
           name: Fetch current running versions
           command: |
             export PREV_APP_VERSION=$(head -1 manifests/current_versions.txt)
-            scp -r $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/releases/$PREV_APP_VERSION _build/prod/rel/robi/releases/
+            scp -r $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/_build/prod _build/prod/
       - persist_to_workspace:
-          root: _build/prod/rel/robi
+          root: _build/prod
           paths:
-            - releases
+            - rel/*
+            - lib/*
 
   build:
     <<: *defaults
@@ -100,7 +101,7 @@ jobs:
       - attach_workspace:
           at: manifests
       - attach_workspace:
-          at: _build/prod/rel/robi
+          at: _build/prod
       - run:
           name: Create release
           command: |
@@ -108,9 +109,10 @@ jobs:
             export PREV_APP_VERSION=$(head -1 manifests/current_versions.txt)
             MIX_ENV=prod mix release --upgrade --upfrom=$PREV_APP_VERSION
       - persist_to_workspace:
-          root: _build/prod/rel/robi
+          root: _build/prod
           paths:
-            - releases/*
+            - rel/*
+            - lib/*
 
   deploy:
     <<: *defaults
@@ -120,7 +122,7 @@ jobs:
       - attach_workspace:
           at: manifests
       - attach_workspace:
-          at: _build/prod/rel/robi
+          at: _build/prod
       - run:
           name: Add remote host fingerprint
           command: |
@@ -129,7 +131,7 @@ jobs:
           name: Deploy Over SSH
           command: |
             export APP_VERSION=$(head -1 manifests/versions.txt)
-            scp -r _build/prod/rel/robi/releases/$APP_VERSION $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/releases/
+            scp -r _build/prod $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/_build/prod/
             ssh $SSH_USER@$SSH_HOST "cd /home/stephane/domains/robi.stephanerobino.com/ && tar -zxvf releases/$APP_VERSION/robi.tar.gz -C public_html/"
             ssh $SSH_USER@$SSH_HOST "/home/stephane/domains/robi.stephanerobino.com/public_html/bin/robi upgrade $APP_VERSION"
             scp manifests/versions.txt $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/manifests

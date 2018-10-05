@@ -52,36 +52,6 @@ jobs:
           paths:
             - deps
 
-  prev_release:
-    <<: *defaults
-    machine:
-      enabled: true
-    steps:
-      - run:
-          name: Add remote host fingerprint
-          command: |
-            ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
-      - attach_workspace:
-          at: manifests
-      - run:
-          name: Fetch current running versions
-          command: |
-            scp $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/manifests/versions.txt manifests/current_versions.txt
-      - persist_to_workspace:
-          root: manifests
-          paths:
-            - current_versions.txt
-      - run: mkdir -p _build/prod/rel/robi/releases
-      - run:
-          name: Fetch current running versions
-          command: |
-            export PREV_APP_VERSION=$(head -1 manifests/current_versions.txt)
-            scp -r $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/releases/$PREV_APP_VERSION _build/prod/rel/robi/releases/
-      - persist_to_workspace:
-          root: _build/prod/rel/robi
-          paths:
-            - releases
-
   build:
     <<: *defaults
     docker:
@@ -100,17 +70,17 @@ jobs:
       - attach_workspace:
           at: manifests
       - attach_workspace:
-          at: _build/prod/rel/robi
+          at: _build/prod
       - run:
           name: Create release
           command: |
             export APP_VERSION=$(head -1 manifests/versions.txt)
-            export PREV_APP_VERSION=$(head -1 manifests/current_versions.txt)
-            MIX_ENV=prod mix release --upgrade --upfrom=$PREV_APP_VERSION
+            MIX_ENV=prod mix release
       - persist_to_workspace:
-          root: _build/prod/rel/robi
+          root: _build/prod
           paths:
-            - releases/*
+            - rel/*
+            - lib/*
 
   deploy:
     <<: *defaults
@@ -120,7 +90,7 @@ jobs:
       - attach_workspace:
           at: manifests
       - attach_workspace:
-          at: _build/prod/rel/robi
+          at: _build/prod
       - run:
           name: Add remote host fingerprint
           command: |
@@ -129,9 +99,10 @@ jobs:
           name: Deploy Over SSH
           command: |
             export APP_VERSION=$(head -1 manifests/versions.txt)
-            scp -r _build/prod/rel/robi/releases/$APP_VERSION $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/releases/
-            ssh $SSH_USER@$SSH_HOST "cd /home/stephane/domains/robi.stephanerobino.com/ && tar -zxvf releases/$APP_VERSION/robi.tar.gz -C public_html/"
-            ssh $SSH_USER@$SSH_HOST "/home/stephane/domains/robi.stephanerobino.com/public_html/bin/robi upgrade $APP_VERSION"
+            scp -r _build/prod $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/_build/prod/
+            ssh $SSH_USER@$SSH_HOST "cd /home/stephane/domains/robi.stephanerobino.com/ && tar -zxvf _build/prod/$APP_VERSION/robi.tar.gz -C public_html/"
+            ssh $SSH_USER@$SSH_HOST "/home/stephane/domains/robi.stephanerobino.com/public_html/bin/robi stop || true"
+            ssh $SSH_USER@$SSH_HOST "/home/stephane/domains/robi.stephanerobino.com/public_html/bin/robi start"
             scp manifests/versions.txt $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/manifests
 workflows:
   version: 2
@@ -141,12 +112,9 @@ workflows:
       - mix_deps_get_and_test:
           requires:
             - checkout
-      - prev_release:
-          requires:
-            - mix_deps_get_and_test
       - build:
           requires:
-            - prev_release
+            - mix_deps_get_and_test
       - deploy:
           requires:
             - build
