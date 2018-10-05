@@ -13,7 +13,7 @@ defmodule RobiWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", RobiWeb do
+  scope "/", RobiWeb do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
