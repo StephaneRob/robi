@@ -78,9 +78,9 @@ jobs:
             export APP_VERSION=$(head -1 manifests/versions.txt)
             MIX_ENV=prod mix release
       - persist_to_workspace:
-          root: _build/prod/rel/robi/releases
+          root: _build/prod/rel/robi
           paths:
-            - robi.tar.gz
+            - releases/*
 
   deploy:
     <<: *defaults
@@ -90,7 +90,7 @@ jobs:
       - attach_workspace:
           at: manifests
       - attach_workspace:
-          at: _build/prod/rel/robi/releases
+          at: _build/prod/rel/robi
       - run:
           name: Add remote host fingerprint
           command: |
