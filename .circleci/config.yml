@@ -13,6 +13,14 @@ jobs:
           key: v1-robi-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - ~/robi
+      - run: touch versions.txt
+      - run:
+          name: Update Manifests
+          command: echo -e "$(date +%Y.%m.%d%H%M)\n$(cat versions.txt)" > versions.txt
+      - persist_to_workspace:
+          root: manifests
+          paths:
+            - versions.txt
 
   mix_deps_get_and_test:
     <<: *defaults
@@ -61,9 +69,16 @@ jobs:
             - v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
             - v1-mix-cache-{{ .Branch }}
             - v1-mix-cache
-      - run: MIX_ENV=prod mix release
+      - attach_workspace:
+          at: manifests
+      - run:
+          name: Set env variable version
+          command: export APP_VERSION=`head -1 versions.txt`
+      - run:
+          name: Create release
+          command: MIX_ENV=prod mix release
       - persist_to_workspace:
-          root: _build/prod/rel/robi/releases/0.0.1
+          root: _build/prod/rel/robi/releases/$APP_VERSION
           paths:
             - robi.tar.gz
 
@@ -72,6 +87,8 @@ jobs:
     machine:
       enabled: true
     steps:
+      - attach_workspace:
+          at: manifests
       - attach_workspace:
           at: _build/prod/rel/robi/releases/0.0.1
       - run:

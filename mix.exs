@@ -4,7 +4,7 @@ defmodule Robi.Mixfile do
   def project do
     [
       app: :robi,
-      version: "0.0.1",
+      version: (if Mix.env == :prod, do: System.get_env("APP_VERSION"), else: "0.0.1"),
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env),
       compilers: [:phoenix, :gettext] ++ Mix.compilers,
