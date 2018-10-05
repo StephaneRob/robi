@@ -13,6 +13,7 @@ jobs:
           key: v1-robi-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - ~/robi
+      - run: mkdir manifests
       - run: touch versions.txt
       - run:
           name: Update Manifests
