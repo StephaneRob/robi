@@ -74,7 +74,9 @@ jobs:
           at: manifests
       - run:
           name: Create release
-          command: APP_ENV=`head -1 manifests/versions.txt` MIX_ENV=prod mix release
+          command: |
+            export APP_VERSION=$(head -1 manifests/versions.txt)
+            MIX_ENV=prod mix release
       - persist_to_workspace:
           root: _build/prod/rel/robi/releases/$APP_VERSION
           paths:
