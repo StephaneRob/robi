@@ -3,6 +3,6 @@ defmodule RobiWeb.PageView do
 
   def render("index.json", %{}) do
     {_, version} = :application.get_key(:robi, :vsn)
-    %{bar: "foo", version: to_string(version)}
+    %{bar: "baz", version: to_string(version)}
   end
 end
