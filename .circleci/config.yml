@@ -73,6 +73,10 @@ jobs:
       - attach_workspace:
           at: manifests
       - run:
+          name: Add remote host fingerprint
+          command: |
+            ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
+      - run:
           name: Fetch current running versions
           command: |
             scp $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/public_html/manifests/versions.txt manifests/current_versions.txt
