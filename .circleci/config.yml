@@ -68,9 +68,9 @@ workflows:
   btd:
     jobs:
       - checkout
-      - mix_deps_get:
+      - mix_deps_get_and_test:
           requires:
             - checkout
       - build:
           requires:
-            - mix_deps_get
+            - mix_deps_get_and_test
