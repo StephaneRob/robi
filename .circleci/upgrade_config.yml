@@ -72,7 +72,7 @@ jobs:
           paths:
             - current_versions.txt
       - run:
-          name: Fetch current running versions
+          name: Fetch old build
           command: |
             scp $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/prod.tar.gz .
             tar -zxvf prod.tar.gz
