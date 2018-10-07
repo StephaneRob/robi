@@ -164,9 +164,12 @@ jobs:
             ssh $SSH_USER@$SSH_HOST "cd /home/stephane/domains/robi.stephanerobino.com/public_html && tar -zxvf robi.tar.gz"
             ssh $SSH_USER@$SSH_HOST "/home/stephane/domains/robi.stephanerobino.com/public_html/bin/robi stop || true"
             ssh $SSH_USER@$SSH_HOST "/home/stephane/domains/robi.stephanerobino.com/public_html/bin/robi start"
-            scp manifests/versions.txt $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/manifests
+      - run:
+          name: persist build and version
+          command: |
             tar -zcvf prod.tar.gz _build/prod
             scp prod.tar.gz $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/prod.tar.gz
+            scp manifests/versions.txt $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/manifests
 
   hot-deploy:
     <<: *defaults
@@ -224,16 +227,32 @@ workflows:
             branches:
               only:
                 - hot-master
-      - deploy:
+      - deploy-approval:
           requires:
             - build
+          type: approval
+          filters:
+            branches:
+              only:
+                - master
+      - hot-deploy-approval:
+          requires:
+            - hot-build
+          type: approval
+          filters:
+            branches:
+              only:
+                - hot-master
+      - deploy:
+          requires:
+            - deploy-approval
           filters:
             branches:
               only:
                 - master
       - hot-deploy:
           requires:
-            - hot-build
+            - hot-deploy-approval
           filters:
             branches:
               only:
