@@ -136,6 +136,8 @@ jobs:
             ssh $SSH_USER@$SSH_HOST "cd /home/stephane/domains/robi.stephanerobino.com/public_html/releases && tar -zxf releases.tar.gz"
             ssh $SSH_USER@$SSH_HOST "/home/stephane/domains/robi.stephanerobino.com/public_html/bin/robi upgrade $APP_VERSION"
             scp manifests/versions.txt $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/manifests
+            tar -zcvf prod.tar.gz _build/prod
+            scp prod.tar.gz $SSH_USER@$SSH_HOST:/home/stephane/domains/robi.stephanerobino.com/prod.tar.gz
 workflows:
   version: 2
   btd:
